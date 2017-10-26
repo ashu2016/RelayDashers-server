@@ -38,7 +38,7 @@ export class RelayRouter {
   public checkForMovedAddress(req: Request, res: Response, next: NextFunction) {
   
     console.log("Check Moved address");
-    var id = req.params.id;
+    var id = req.query.key;
     console.log(id);
     var db = admin.database();
     var ref = db.ref("original-address-list");
@@ -47,9 +47,12 @@ export class RelayRouter {
             console.log(snap.val());
            let name = snap.child(`${id}/recipientName`).val();
             let address = snap.child(`${id}/recipientAddress`).val();
+            let mailerId = snap.child(`${id}/mailerId`).val();
             //console.log(snap.child(id).child("recipientAddress").val());
-            FileUtils.createInputFile(name,address);
-            FileUtils.callProgram();
+             FileUtils.createInputFile(mailerId,name,address);
+             FileUtils.callProgram();
+             FileUtils.waitForOutputFile();
+             
         }
       });
       res.status(200).send("Success");
@@ -100,8 +103,8 @@ export class RelayRouter {
    * endpoints.
    */
   init() {
-    this.router.get('/', this.getAll);
-    this.router.get('/:id', this.checkForMovedAddress);
+    this.router.get('/helloworld', this.getAll);
+    this.router.get('/', this.checkForMovedAddress);
     this.router.post('/',this.storeAddress);
   }
 
